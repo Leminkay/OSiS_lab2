@@ -98,9 +98,6 @@ int main(int argc, char *argv[]) {
 				}
 				continue;							
 			}
-			
-			perror(pack.comm);
-			perror(pack.msg);
 			if( strcmp(pack.comm, "DATA") == 0){
 				if(strcmp(n, "") != 0 && strcmp(m, "") != 0){
 					strcpy(pack.status, "ERROR");	
@@ -164,8 +161,8 @@ int main(int argc, char *argv[]) {
 				}else{
 					int res = delta(atoi(n), atoi(m));
 					sprintf(resC, "%d", res);
-					printf("n = %d, m = %d\n", atoi(n), atoi(m));
-					perror(resC);
+					printf("n = %d \nm = %d\nres = %s \n", atoi(n), atoi(m), resC);
+					
 
 					strcpy(pack.status, "OK");
 					strcpy(pack.msg, "250: value is = ");

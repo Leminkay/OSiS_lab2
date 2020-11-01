@@ -56,9 +56,8 @@ int main(int argc, char *argv[]) {
 		perror("ERROR: Unable to recieve the package");
 		return 3;
 	}
-	perror(pack.comm);
-	perror(pack.status);
-	perror(pack.msg);
+	printf("%s \n", pack.status);
+	printf("%s \n", pack.msg);
 	printf("==========\n");
 
 	while(1){
@@ -82,9 +81,9 @@ int main(int argc, char *argv[]) {
 			perror("ERROR: Unable to recieve the package");
 			return 3;
 		}
-		perror(pack.comm);
-		perror(pack.status);
-		perror(pack.msg);
+		printf("%s \n", pack.status);
+		printf("%s \n", pack.msg);
+
 		printf("==========\n");
 	}
 	
