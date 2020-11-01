@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		strcpy(pack.status,"CONNECTED\n");
-		strcpy(pack.msg,"250: Successful connection\n");
+		strcpy(pack.msg,"250: DGRAM server v0\n");
 		if (sendto(listner, (struct package *)&pack, sizeof(pack), 0, (struct sockaddr *)&cur_claddr, c_len) == -1){
 			perror("ERROR: Unable to send a package");
 			break;

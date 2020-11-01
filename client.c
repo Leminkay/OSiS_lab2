@@ -86,6 +86,6 @@ int main(int argc, char *argv[]) {
 
 		printf("==========\n");
 	}
-	
+	close(sock);
 	return 0;
 }
