@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include "func.h"
 #define DEF_PORT 4311
@@ -37,6 +38,10 @@ int main(int argc, char *argv[]) {
 		}
 		
 	}
+
+	struct timeval timeout;
+	timeout.tv_sec = 30;
+	timeout.tv_usec = 0;
 	
 	int listner = socket(AF_INET, SOCK_DGRAM, 0);
 	if (listner < 0) {
@@ -52,7 +57,7 @@ int main(int argc, char *argv[]) {
 		perror("ERROR: Cannot connect.\n");
 		return 2;
 	}
-	
+	setsockopt(listner, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 	int sock_cl;
 	int size_in;
 	char buf1[1024], buf2[1024];
@@ -71,12 +76,14 @@ int main(int argc, char *argv[]) {
 			cur_claddr = cons_arr[0];
 			shiftArr(cons_arr, cur_cons);
 			cur_cons--;
+			printf("cr cons %d\n", cur_cons);
 		}else{
 			if (recvfrom(listner, (struct package *)&pack, sizeof(pack), 0, (struct sockaddr *)&cur_claddr, &c_len) == -1){
 				perror("ERROR: Unable to recieve the package");
 				break;
 			}
 		}
+
 		strcpy(pack.status,"CONNECTED\n");
 		strcpy(pack.msg,"250: DGRAM server v0\n");
 		if (sendto(listner, (struct package *)&pack, sizeof(pack), 0, (struct sockaddr *)&cur_claddr, c_len) == -1){
@@ -88,13 +95,24 @@ int main(int argc, char *argv[]) {
 			
 			socklen_t len = sizeof(claddr);
 			if (recvfrom(listner, (struct package *)&pack, sizeof(pack), 0, (struct sockaddr *)&claddr, &len) == -1){
+				if(errno == EWOULDBLOCK){
+					perror("ERROR: timeout");
+					break;
+				}
 				perror("ERROR: Unable to recieve the package");
 				break;
 			}
 			if(memcmp(&claddr, &cur_claddr, sizeof(struct sockaddr)) != 0){
+				int i;
+				for(i = 0; i < cur_cons; i++){
+					if(memcmp(&claddr, &cur_claddr, sizeof(struct sockaddr)) == 0){
+						continue;	
+					}
+				}
 				if(cur_cons < cons - 1){
 					cons_arr[cur_cons] = claddr;
 					cur_cons++;
+					printf("cr cons %d\n", cur_cons);
 				}
 				continue;							
 			}

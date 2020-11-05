@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 #define DEF_PORT 4311
 
 
@@ -49,13 +50,18 @@ int main(int argc, char *argv[]) {
 	strcpy(pack.comm, "");
 	strcpy(pack.msg, "");
 	strcpy(pack.status, "");
+
 	if (sendto(sock, (struct package *)&pack, sizeof(pack), 0, (struct sockaddr *)&addr , len) == -1){
 		perror("ERROR: Unable to send the package");
 	}
+
+
 	if (recvfrom(sock, (struct package *)&pack, sizeof(pack), 0 ,(struct sockaddr *)&addr , &len) == -1){
 		perror("ERROR: Unable to recieve the package");
 		return 3;
 	}
+
+
 	printf("%s \n", pack.status);
 	printf("%s \n", pack.msg);
 	printf("==========\n");
@@ -70,13 +76,18 @@ int main(int argc, char *argv[]) {
 			scanf("%s", in_msg);
 			strcpy(pack.msg, in_msg);
 		}
+		else if(!(strcmp(pack.comm, "QUIT") == 0 || strcmp(pack.comm, "VAR") == 0 || strcmp(pack.comm, "RES")  == 0 || strcmp(pack.comm, "RSET") == 0)){
+			perror("ERROR: unavailable command");			
+			continue;		
+		}
 		if (sendto(sock, (struct package *)&pack, sizeof(pack), 0, (struct sockaddr *)&addr , len) == -1){
 			perror("ERROR: Unable to send the package");
 			return 2;
 		}
 		if(strcmp(pack.comm, "QUIT") == 0){
 			break;		
-		}
+		} 
+
 		if (recvfrom(sock, (struct package *)&pack, sizeof(pack), 0 ,(struct sockaddr *)&addr , &len) == -1){
 			perror("ERROR: Unable to recieve the package");
 			return 3;
